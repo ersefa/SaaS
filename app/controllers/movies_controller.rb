@@ -8,7 +8,7 @@ class MoviesController < ApplicationController
 
   def index
     @order = params[:order]
-    @ratings = params[:ratings] || []
+    @ratings = (params[:ratings] || {}).keys
     
     @movies = Movie.order(@order)
     @movies = @movies.where(rating: @ratings) unless @ratings.empty?
