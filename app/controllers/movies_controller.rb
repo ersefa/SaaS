@@ -7,11 +7,22 @@ class MoviesController < ApplicationController
   end
 
   def index
-    @order = params[:order]
-    @ratings = (params[:ratings] || {}).keys
+    redirect = false
+
+    [:order, :ratings].each do |param|
+      if !params[param] && !!session[param]
+        params[param] = session[param]
+        redirect = true
+      end
+      session[param] = params[param]
+      self.instance_variable_set("@#{param}".to_sym, params[param] || session[param])
+    end
+
+    redirect_to url_for(order: @order, ratings: @ratings) if redirect
+
     
     @movies = Movie.order(@order)
-    @movies = @movies.where(rating: @ratings) unless @ratings.empty?
+    @movies = @movies.where(rating: @ratings.keys) unless @ratings.blank?
     
     @all_ratings = Movie.ratings
   end
