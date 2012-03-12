@@ -8,7 +8,12 @@ class MoviesController < ApplicationController
 
   def index
     @order = params[:order]
+    @ratings = params[:ratings] || []
+    
     @movies = Movie.order(@order)
+    @movies = @movies.where(rating: @ratings) unless @ratings.empty?
+    
+    @all_ratings = Movie.ratings
   end
 
   def new
